@@ -81,7 +81,7 @@ button:hover{
     <p><strong>Instructions:</strong></p>
     <ul>
         <li>Total Time: 15 Minutes</li>
-        <li>Start Clicking the button will start the timer।</li>
+        <li>Start Clicking the button will start the timer</li>
         <li>Answers will be automatically submitted when time is up</li>
         <li>Once started, the timer cannot be stopped</li>
     </ul>
@@ -98,8 +98,8 @@ button:hover{
         <label>Candidate Name:</label>
         <input type="text" name="candidate_name" required>
 
-<label>Passport No:</label>
-        <input type="text" name="candidate_name" required>
+        <label>Passport No:</label>
+        <input type="text" name="passport_no" required>
 
         <div class="question">
             <h3>1. Tell us briefly about yourself</h3>
@@ -126,7 +126,7 @@ button:hover{
             <textarea name="q5"></textarea>
         </div>
 
-        <button type="button" onclick="submitInterview()">Submit Answers</button>
+        <button type="button" id="submitBtn" onclick="submitInterview()">Submit Answers</button>
 
     </form>
 
@@ -136,10 +136,24 @@ button:hover{
 
 <script>
 
+const FORM_KEY = "interview_submitted";
 let timeLeft = 15 * 60;
 let timerInterval;
 
+// page load check (already submitted)
+window.onload = function () {
+    if (localStorage.getItem(FORM_KEY)) {
+        lockSystem();
+    }
+};
+
 function startInterview() {
+
+    if (localStorage.getItem(FORM_KEY)) {
+        alert("You have already submitted this interview!");
+        lockSystem();
+        return;
+    }
 
     document.getElementById("startSection").style.display = "none";
     document.getElementById("interviewSection").classList.remove("hidden");
@@ -155,7 +169,7 @@ function startInterview() {
 
         if(timeLeft <= 0){
             clearInterval(timerInterval);
-            alert("Time is over! Answers will be submitted automatically.");
+            alert("Time is over! Auto submitting...");
             submitInterview();
         }
 
@@ -165,6 +179,13 @@ function startInterview() {
 }
 
 function submitInterview(){
+
+    // prevent double submit
+    if (localStorage.getItem(FORM_KEY)) {
+        alert("Already submitted!");
+        lockSystem();
+        return;
+    }
 
     clearInterval(timerInterval);
 
@@ -179,13 +200,27 @@ function submitInterview(){
 
     alert(result);
 
-    // এখানে চাইলে Google Sheet / Database / Email API এ ডাটা পাঠাতে পারবেন
+    // save submission lock
+    localStorage.setItem(FORM_KEY, "true");
 
-    document.body.innerHTML =
-    "<div style='text-align:center;margin-top:100px;font-family:Arial'>" +
-    "<h1>Thank You</h1>" +
-    "<h2>Your Interview Has Been Submitted.</h2>" +
-    "</div>";
+    lockSystem();
+}
+
+function lockSystem() {
+
+    const form = document.getElementById("interviewForm");
+
+    if (form) {
+        for (let el of form.elements) {
+            el.disabled = true;
+        }
+    }
+
+    const btn = document.getElementById("submitBtn");
+    if (btn) btn.style.display = "none";
+
+    document.getElementById("startSection").innerHTML =
+        "<h2 style='color:red;text-align:center;'>You have already submitted this interview.</h2>";
 }
 
 </script>

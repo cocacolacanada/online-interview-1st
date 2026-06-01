@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Online Interview Assessment</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f4f4;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    background:#fff;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+h1{
+    text-align:center;
+    color:#333;
+}
+
+.timer{
+    text-align:center;
+    font-size:28px;
+    font-weight:bold;
+    color:red;
+    margin:20px 0;
+}
+
+.question{
+    margin-bottom:20px;
+}
+
+textarea{
+    width:100%;
+    min-height:100px;
+    padding:10px;
+    resize:vertical;
+}
+
+input[type=text]{
+    width:100%;
+    padding:10px;
+    margin-bottom:15px;
+}
+
+button{
+    background:#007bff;
+    color:white;
+    border:none;
+    padding:12px 25px;
+    cursor:pointer;
+    border-radius:5px;
+}
+
+button:hover{
+    background:#0056b3;
+}
+
+.hidden{
+    display:none;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h1>Online Interview Assessment</h1>
+
+<div id="startSection">
+    <p><strong>Instructions:</strong></p>
+    <ul>
+        <li>Total Time: 15 Minutes</li>
+        <li>Start Clicking the button will start the timer।</li>
+        <li>Answers will be automatically submitted when time is up</li>
+        <li>Once started, the timer cannot be stopped</li>
+    </ul>
+
+    <button onclick="startInterview()">Start Interview</button>
+</div>
+
+<div id="interviewSection" class="hidden">
+
+    <div class="timer" id="timer">15:00</div>
+
+    <form id="interviewForm">
+
+        <label>Candidate Name:</label>
+        <input type="text" name="candidate_name" required>
+
+<label>Passport No:</label>
+        <input type="text" name="candidate_name" required>
+
+        <div class="question">
+            <h3>1. Tell us briefly about yourself</h3>
+            <textarea name="q1"></textarea>
+        </div>
+
+        <div class="question">
+            <h3>2. Why did you apply for this position?</h3>
+            <textarea name="q2"></textarea>
+        </div>
+
+        <div class="question">
+            <h3>3. What is your greatest skill?</h3>
+            <textarea name="q3"></textarea>
+        </div>
+
+        <div class="question">
+            <h3>4. How did you resolve a challenging situation?</h3>
+            <textarea name="q4"></textarea>
+        </div>
+
+        <div class="question">
+            <h3>5. What is your expected salary?</h3>
+            <textarea name="q5"></textarea>
+        </div>
+
+        <button type="button" onclick="submitInterview()">Submit Answers</button>
+
+    </form>
+
+</div>
+
+</div>
+
+<script>
+
+let timeLeft = 15 * 60;
+let timerInterval;
+
+function startInterview() {
+
+    document.getElementById("startSection").style.display = "none";
+    document.getElementById("interviewSection").classList.remove("hidden");
+
+    timerInterval = setInterval(function() {
+
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+
+        document.getElementById("timer").innerHTML =
+            String(minutes).padStart(2,'0') + ":" +
+            String(seconds).padStart(2,'0');
+
+        if(timeLeft <= 0){
+            clearInterval(timerInterval);
+            alert("Time is over! Answers will be submitted automatically.");
+            submitInterview();
+        }
+
+        timeLeft--;
+
+    },1000);
+}
+
+function submitInterview(){
+
+    clearInterval(timerInterval);
+
+    const form = document.getElementById("interviewForm");
+    const formData = new FormData(form);
+
+    let result = "Interview Submitted Successfully!\n\n";
+
+    for(let pair of formData.entries()){
+        result += pair[0] + " : " + pair[1] + "\n\n";
+    }
+
+    alert(result);
+
+    // এখানে চাইলে Google Sheet / Database / Email API এ ডাটা পাঠাতে পারবেন
+
+    document.body.innerHTML =
+    "<div style='text-align:center;margin-top:100px;font-family:Arial'>" +
+    "<h1>Thank You</h1>" +
+    "<h2>Your Interview Has Been Submitted.</h2>" +
+    "</div>";
+}
+
+</script>
+
+</body>
+</html>
